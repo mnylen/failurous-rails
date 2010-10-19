@@ -9,13 +9,15 @@ describe Failurous::FailNotification do
     end
   end
   
-  it "should create a new section when #section is called for the first time and and pass the section to the block" do
-    notification = Failurous::FailNotification.build() do |notification|
-      notification.section(:summary) do |summary|
-        summary.should be_a(Failurous::Section)
+  describe "#section" do
+    it "should create a new section when called for the first time and pass the section to the block" do
+      notification = Failurous::FailNotification.build() do |notification|
+        notification.section(:summary) do |summary|
+          summary.should be_a(Failurous::Section)
+        end
       end
-    end
     
-    notification.notification_data[:sections].size.should == 1
+      notification.notification_data[:sections].size.should == 1
+    end
   end
 end
