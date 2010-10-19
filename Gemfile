@@ -5,6 +5,8 @@ gem "activesupport"
 
 group :development do
   gem "jeweler"
+  gem "yard"
+  gem "bluecloth"
 end
 
 group :test do
