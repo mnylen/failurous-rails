@@ -9,7 +9,7 @@ Failurous (see http://github.com/mnylen/failurous).
 
 1\. Add this to your gemfile
 
-    gem 'failurous-rails'
+    gem 'failurous-rails', :git => 'git://github.com/mnylen/failurous-rails.git'
 
 2\. Next you need to add the following under config/initializer/failurous.rb:
     
