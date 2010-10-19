@@ -61,14 +61,14 @@ module Failurous
     end
     
     def section(name, &block)
-      new_section = Section.new
-      notification_data[:sections][name] = new_section
+      section = notification_data[:sections][name] || Section.new
+      notification_data[:sections][name] = section
       
       if block_given?
-        block.call(new_section)
+        block.call(section)
       end
       
-      new_section
+      section
     end
   end
   

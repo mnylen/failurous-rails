@@ -19,5 +19,12 @@ describe Failurous::FailNotification do
     
       notification.notification_data[:sections].size.should == 1
     end
+    
+    it "should not create a new section when called for the second time with the same section name" do
+      notification = Failurous::FailNotification.build() do |notification|
+        notification.section(:summary).should == notification.section(:summary)
+        notification.notification_data[:sections].size.should == 1
+      end
+    end
   end
 end
