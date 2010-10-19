@@ -12,7 +12,8 @@ Gem::Specification.new do |s|
   s.date = %q{2010-10-19}
   s.description = %q{Failurous is an open source webapp for monitoring exceptions in your live applications. failurous-rails is Failurous's Rails complement that allows you to send easily notifications of new fails to your Failurous installation.}
   s.extra_rdoc_files = [
-    "README.md"
+    "LICENSE",
+     "README.md"
   ]
   s.homepage = %q{http://github.com/mnylen/failurous-rails}
   s.rdoc_options = ["--charset=UTF-8"]
