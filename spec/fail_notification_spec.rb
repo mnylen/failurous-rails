@@ -67,4 +67,40 @@ describe Failurous::FailNotification do
       end
     end
   end
+  
+  describe "#convert_to_failurous_internal_format" do
+    it "should convert the data to a format used by Failurous" do
+      notification = Failurous::FailNotification.build() do |notification|
+        notification.title "NoMethodError: Called `tap' for nil:NilClass"
+        notification.location "test#hello"
+        
+        notification.section(:summary) do |summary|
+          summary.field(:type, "NoMethodError", {:use_in_checksum => true})
+          summary.field(:message, "Called `tap' for nil:NilClass", {:use_in_checksum => false})
+        end
+        
+        notification.section(:details) do |details|
+          details.field(:full_backtrace, "x\ny\nz", {:use_in_checksum => false})
+          details.field(:foobar, "abc", {:before => :full_backtrace, :use_in_checksum => true})
+        end
+      end
+      
+      notification.convert_to_failurous_internal_format.should == {
+        :title    => "NoMethodError: Called `tap' for nil:NilClass",
+        :location => "test#hello",
+        :use_title_in_checksum => false,
+        :use_location_in_checksum => true,
+        :data => [
+          [:summary, [
+            [:type, "NoMethodError", {:use_in_checksum => true}],
+            [:message, "Called `tap' for nil:NilClass", {:use_in_checksum => false}]
+          ]],
+          [:details, [
+            [:foobar, "abc", {:use_in_checksum => true}],
+            [:full_backtrace, "x\ny\nz", {:use_in_checksum => false}]
+          ]]
+        ]
+      }
+    end
+  end
 end

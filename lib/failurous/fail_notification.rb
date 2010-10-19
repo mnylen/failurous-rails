@@ -60,9 +60,25 @@ module Failurous
       notification
     end
     
+    def title(title)
+      @notification_data[:title] = title
+    end
+    
+    def location(location)
+      @notification_data[:location] = location
+    end
+    
+    def use_title_in_checksum(value = false)
+      defaults[:use_title_in_checksum] = value
+    end
+    
+    def use_location_in_checksum(value = true)
+      defaults[:use_location_in_checksum] = value
+    end
+    
     def section(name, &block)
-      section = notification_data[:sections][name] || Section.new
-      notification_data[:sections][name] = section
+      section = @notification_data[:sections][name] || Section.new(name)
+      @notification_data[:sections][name] = section
       
       if block_given?
         block.call(section)
@@ -70,15 +86,27 @@ module Failurous
       
       section
     end
+    
+    def convert_to_failurous_internal_format
+      {
+        :title => @notification_data[:title],
+        :location => @notification_data[:location],
+        :use_title_in_checksum => @notification_data[:use_title_in_checksum],
+        :use_location_in_checksum => @notification_data[:use_location_in_checksum],
+        :data => [].tap { |data| @notification_data[:sections].values.each { |section| data << section.convert_to_failurous_internal_format } }
+      }
+    end
+    
   end
   
   class Section
-    def initialize
+    def initialize(name)
       @fields = Dictionary.new
+      @name = name
     end
     
     def field(name, value, options = {})
-      field = Field.new(name, value, options)
+      field = Field.new(name, value, options.dup)
       
       if options[:after] or options[:before]
         @fields.delete(name) if @fields.has_key?(name)
@@ -100,6 +128,15 @@ module Failurous
       field
     end
     
+    def convert_to_failurous_internal_format
+      data = [@name, []]
+      fields.each do |field|
+        data[1] << field.convert_to_failurous_internal_format
+      end
+      
+      data
+    end
+    
     def fields
       @fields.values
     end
@@ -110,6 +147,16 @@ module Failurous
     
     def initialize(*args)
       @name, @value, @options = args
+      filter_options!
+    end
+    
+    def filter_options!
+      @options.delete(:before)
+      @options.delete(:after)
+    end
+    
+    def convert_to_failurous_internal_format
+      [name, value, options]
     end
   end
 end
