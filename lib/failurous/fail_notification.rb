@@ -73,5 +73,43 @@ module Failurous
   end
   
   class Section
+    def initialize
+      @fields = Dictionary.new
+    end
+    
+    def field(name, value, options = {})
+      field = Field.new(name, value, options)
+      
+      if options[:after] or options[:before]
+        @fields.delete(name) if @fields.has_key?(name)
+        
+        i = 0
+        search = options[:before] || options[:after]
+        @fields.order.each do |key|
+          break if key == search
+          i += 1
+        end
+        
+        i ||= @fields.size
+        @fields.insert(i, name, field) if options[:before]
+        @fields.insert(i+1, name, field) if options[:after]
+      else
+        @fields[name] = field
+      end
+      
+      field
+    end
+    
+    def fields
+      @fields.values
+    end
+  end
+  
+  class Field
+    attr_accessor :name, :value, :options
+    
+    def initialize(*args)
+      @name, @value, @options = args
+    end
   end
 end

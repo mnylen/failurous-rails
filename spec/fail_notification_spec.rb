@@ -26,5 +26,45 @@ describe Failurous::FailNotification do
         notification.notification_data[:sections].size.should == 1
       end
     end
+    
+    
+    describe "#field" do
+      before(:each) do
+        Failurous::FailNotification.build do |notification|
+          @section = notification.section(:summary)
+        end
+      end
+      
+      it "should add a field to the section" do
+        notification = Failurous::FailNotification.build() do |notification|
+          field = @section.field(:type, "NoMethodError", {:use_in_checksum => true})
+          @section.fields.size.should == 1
+          @section.fields.first.should == field
+        end
+      end
+      
+      it "should not create another field when called with the same field name, but override the value and options in existing one" do
+        @section.field(:type, "NoMethodError", {:use_in_checksum => true})
+        field = @section.field(:type, "FoobarError", {:use_in_checksum => false})
+        
+        @section.fields.size.should == 1
+        @section.fields.first.value.should == "FoobarError"
+      end
+      
+      it "should place the field right before the given field inside the section if :before => :field_name was given in options" do
+        @section.field(:type, "NoMethodError", {:use_in_checksum => true})
+        field = @section.field(:xyz, "TestTest", {:before => :type})
+        
+        @section.fields.first.should == field
+      end
+      
+      it "should place the field right after the given field inside the section if :after => :field_name was given in options" do
+        @section.field(:type, "NoMethodError")
+        @section.field(:message, "Called `tap' for nil:NilClass")
+        field = @section.field(:xyz, "TestTest", {:after => :type})
+        
+        @section.fields[1].should == field
+      end
+    end
   end
 end
