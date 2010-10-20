@@ -34,7 +34,7 @@ Rails 2 support is upcoming.
 failurous-rails can be used to send custom notifications to Failurous. This can be accomplished
 by building a `FailNotification`:
 
-    FailNotification.build do |notification|
+    Failurous::FailNotification.send do |notification|
       notification.title "Title to show in Failurous"
       notification.location "something indicating the location"
       notification.use_title_in_checksum false
@@ -53,42 +53,38 @@ by building a `FailNotification`:
 
 You can add as many sections and fields as you want.
 
-The supported options in Failurous for fields are:
+Failurous currently supports at least the following options for fields:
 
-* `:use_in_checksum` - use the value of the field as combining factor when fails are being combined? (default `false`)
-* `:humanize_field_name` - when the fail is shown, should the field name be humanized (e.g. "full_name" => "Full name")? (default `true`)
+* `:use_in_checksum` - use the field value in checksum
+* `:humanize_field_name` - humanize field name when displaying the
 
-The builder also allows the following options to be passed:
+To see full list of field options, please consult Failurous documentation.
 
-* `:after` - if given, adds the field *after* the specified field
-* `:before` - if given, adds the field *before* the specified field
+The builder also supports the following options for field placement:
+
+* `:before` - insert the new field before the specified field
+* `:after` - insert the new field after the specified field
+
+If `:before` and `:after` is omitted, the field will be placed after the last field in the section.
 
 To use an exception as a basis for the notification, pass the exception as a parameter to
-`build` method. This will prepopulate the notification with title (_type: message_)
-and sections _summary_ and _details_.
+`build` method. This will prepopulate the notification with title (in format _type: message_),
+location (top of backtrace), and sections _summary_ and _details_.
 
-Summary will contain
+*Summary* will contain:
+
 * `:type` of the exception (used in checksum)
 * exception `:message` (not used in checksum)
+* `:top_of_backtrace` (used in checksum)
 
-You can add more sections and fields in the block.
+*Details* will contain:
 
-    FailNotification.build(exception) do |notification|
-      notification.section(:your_app_name) { |my_app| my_app.field(:username, "...") }
-    end
+* `:full_backtrace` (not used in checksum)
 
-To send the notification after it is built, use the `.send` method (also allows for
-optional exception):
-
-    FailNotification.send(exception) do |notification|
-      ...
-    end                                        
-                                                                                          
     
 ## Upcoming features
 
 * Support for Rails 2
 * Better syntax for configuration
-* Better syntax for creating custom fail notifications
 * Way to add custom details to fail notifications
 * Better way to initialize it for just production mode
