@@ -6,22 +6,14 @@ require 'action_dispatch'
 
 module Failurous
   class FailMiddleware
-    def self.default_ignore_exceptions
-      [].tap do |exceptions|
-        exceptions << ::ActiveRecord::RecordNotFound if defined?(::ActiveRecord::RecordNotFound)
-        exceptions << ::AbstractController::ActionNotFound if defined?(::AbstractController::ActionNotFound)
-        exceptions << ::ActionController::RoutingError if defined?(::ActionController::RoutingError)      
-      end
-    end
-
-    def initialize(app, options = {})
-      @app, @options = app, options
+    def initialize(app)
+      @app = app
     end
 
     def call(env)
       @app.call(env)
     rescue Exception => exception
-      unless FailMiddleware.default_ignore_exceptions.include?(exception.class)
+      unless Config.ignore_exceptions.include?(exception.class)
         send_exception_notification(env, exception)
       end
 
@@ -35,26 +27,21 @@ module Failurous
       @exception  = exception
       @controller = env['action_controller.instance'] || MissingController.new
       @request    = ActionDispatch::Request.new(env)
-      @backtrace  = clean_backtrace(exception)
-    
-      notification = FailNotification.new.
-        from_exception(exception).
-        add_field(:request, :REQUEST_METHOD, @request.method, {:humanize_field_name => false}).
-        add_field(:request, :REQUEST_URI, @request.request_uri, {:humanize_field_name => false}).
-        add_field(:request, :REMOTE_ADDR, @request.remote_ip, {:humanize_field_name => false}).
-        add_field(:request, :HTTP_USER_AGENT, @request.headers["User-Agent"], {:humanize_field_name => false}).
-        add_field(:summary, :location, "#{@controller.controller_name}##{@controller.action_name}", {:use_in_checksum => true}).
-        add_field(:details, :params, @controller.params, {:use_in_checksum => false})
-      
-      
-      FailNotifier.send_fail(notification)
-    end  
-  
-    def clean_backtrace(exception)
-      Rails.respond_to?(:backtrace_cleaner) ?
-        Rails.backtrace_cleaner.send(:filter, exception.backtrace) :
-        exception.backtrace
+
+      FailNotification.send(exception) do |notification|
+        notification.location "#{@controller.controller_name}##{@controller.action_name}"
+        
+        notification.section(:request) do |request|
+          request.field(:REQUEST_METHOD, @request.method, {:humanize_field_name => false})
+          request.field(:REQUEST_URI, @request.request_uri, {:humanize_field_name => false})
+          request.field(:REMOTE_ADDR, @request.remote_ip, {:humanize_field_name => false})
+          request.field(:HTTP_USER_AGENT, @request.headers["User-Agent"], {:humanize_field_name => false})
+        end
+        
+        notification.section(:summary) do |summary|
+          summary.field(:params, @controller.params, {:use_in_checksum => false})
+        end
+      end
     end
-  
   end
 end

@@ -2,6 +2,7 @@ module Failurous
   class Config
     @@server_address = ""
     @@api_key = ""
+    @@ignore_exceptions = []
     
     class << self
       def server_address=(val)
@@ -18,6 +19,14 @@ module Failurous
     
       def api_key
         @@api_key
+      end
+      
+      def ignore_exceptions=(val)
+        @@ignore_exceptions = val
+      end
+      
+      def ignore_exceptions
+        @@ignore_exceptions
       end
     end
   end

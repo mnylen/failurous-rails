@@ -79,6 +79,14 @@ module Failurous
     end
     
     
+    def self.send(exception = nil, &block)
+      notification = self.build(exception, &block)
+      FailNotifier.send_fail(notification)
+      
+      notification
+    end
+    
+    
     # Sets the title for the fail notification
     def title(title)
       @notification_data[:title] = title
