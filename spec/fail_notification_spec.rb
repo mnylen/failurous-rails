@@ -7,6 +7,13 @@ describe Failurous::FailNotification do
         notification.should be_a(Failurous::FailNotification)
       end
     end
+    
+    it "should prepopulate the notification from exception" do
+      exception = RuntimeError.new("hell")
+      exception.stub!(:backtrace).and_return(["foo", "bar"])
+      notification = Failurous::FailNotification.build(exception)
+      notification.notification_data[:sections].size.should == 2
+    end
   end
   
   describe "#section" do
