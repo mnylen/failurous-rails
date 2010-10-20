@@ -1,5 +1,6 @@
 require 'active_support'
 require 'dictionary'
+require 'rails'
 
 module Failurous
   # Notification of a fail with all the details. Can be sent to the Failurous
@@ -125,17 +126,21 @@ module Failurous
     
     
     def prepopulate_from_exception(exception)
+      backtrace = Rails.respond_to?(:backtrace_cleaner) ?
+        Rails.backtrace_cleaner.send(:filter, exception.backtrace) :
+        exception.backtrace
+      
       self.title "#{exception.class.to_s}: #{exception.message}"
       self.location "#{exception.backtrace[0]}"
 
       self.section(:summary) do |summary|
         summary.field(:type, exception.class.to_s, {:use_in_checksum => true})
         summary.field(:message, exception.message, {:use_in_checksum => false})
-        summary.field(:top_of_backtrace, exception.backtrace[0], {:use_in_checksum => true})
+        summary.field(:top_of_backtrace, backtrace[0], {:use_in_checksum => true})
       end
 
       self.section(:details) do |details|
-        details.field(:full_backtrace, exception.backtrace.join('\n'), {:use_in_checksum => false})
+        details.field(:full_backtrace, backtrace.join('\n'), {:use_in_checksum => false})
       end
     end
     

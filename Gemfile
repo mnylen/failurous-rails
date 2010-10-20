@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 gem "dictionary"
 gem "activesupport"
+gem "railties"
 
 group :development do
   gem "jeweler"
