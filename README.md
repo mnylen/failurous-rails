@@ -32,28 +32,58 @@ Rails 2 support is upcoming.
 ## Sending custom notifications to Failurous
 
 failurous-rails can be used to send custom notifications to Failurous. This can be accomplished
-by building a `FailNotification` using the following syntax: 
+by building a `FailNotification`:
 
-    Failurous::FailNotification.set_title('Title for your fail').
-      add_field(:section_name, :field_name, {:use_in_checksum => true | false}).
-      add_field(:another, :field, {...})
+    FailNotification.build do |notification|
+      notification.title "Title to show in Failurous"
+      notification.location "something indicating the location"
+      notification.use_title_in_checksum false
+      notification.use_location_in_checksum true
+  
+      notification.section(:summary) do |summary|
+        summary.field(:type, "NoMethodError", {:use_in_checksum => true})
+        summary.field(:message, "Called `tap' for nil:NilClass", {:use_in_checksum => true})
+      end
 
-To send the exception, you can either call `send` on the built `FailNotification` or use
-`FailNotifier.send_fail`
+      notification.section(:request) do |request|
+        request.field(:HTTP_USER_AGENT, "Mozilla ...", {:humanize_field_name => false})
+      end
+    end
+    
 
+You can add as many sections and fields as you want.
 
-The supported options for fields are:
+The supported options in Failurous for fields are:
 
 * `:use_in_checksum` - use the value of the field as combining factor when fails are being combined? (default `false`)
 * `:humanize_field_name` - when the fail is shown, should the field name be humanized (e.g. "full_name" => "Full name")? (default `true`)
 
-You can also prepopulate the fail notification from details of exception:
+The builder also allows the following options to be passed:
 
-    begin
-      raise 'hell'
-    rescue => boom
-      Failurous::FailNotification.from_exception(boom).add_field(...).send
+* `:after` - if given, adds the field *after* the specified field
+* `:before` - if given, adds the field *before* the specified field
+
+To use an exception as a basis for the notification, pass the exception as a parameter to
+`build` method. This will prepopulate the notification with title (_type: message_)
+and sections _summary_ and _details_.
+
+Summary will contain
+* `:type` of the exception (used in checksum)
+* exception `:message` (not used in checksum)
+
+You can add more sections and fields in the block.
+
+    FailNotification.build(exception) do |notification|
+      notification.section(:your_app_name) { |my_app| my_app.field(:username, "...") }
     end
+
+To send the notification after it is built, use the `.send` method (also allows for
+optional exception):
+
+    FailNotification.send(exception) do |notification|
+      ...
+    end                                        
+                                                                                          
     
 ## Upcoming features
 
