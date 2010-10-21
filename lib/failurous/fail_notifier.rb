@@ -9,6 +9,8 @@ module Failurous
       
       http = ::Net::HTTP.new(Failurous::Config.server_address, Failurous::Config.server_port)
       http.post("/api/projects/#{Failurous::Config.api_key}/fails", data)
+    rescue => boom
+      
     end
   end
 end

@@ -100,12 +100,12 @@ module Failurous
     
     # Sets the boolean flag for using title in the checksum on Failurous
     def use_title_in_checksum(value = false)
-      defaults[:use_title_in_checksum] = value
+      @notification_data[:use_title_in_checksum] = value
     end
     
     # Sets the boolean flag for using location in the checksum on Failurous 
     def use_location_in_checksum(value = true)
-      defaults[:use_location_in_checksum] = value
+      @notification_data[:use_location_in_checksum] = value
     end
     
     # Creates a new section with the given name (or returns existing one)
