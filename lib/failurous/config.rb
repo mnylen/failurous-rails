@@ -4,8 +4,17 @@ module Failurous
     @@server_port = 80
     @@api_key = ""
     @@ignore_exceptions = []
-        
+    @@use_ssl = false
+    
     class << self
+      def use_ssl=(val)
+        @@use_ssl = val
+      end
+      
+      def use_ssl?
+        @@use_ssl
+      end
+      
       def server_address=(val)
         @@server_address = val
       end

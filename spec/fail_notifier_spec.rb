@@ -10,20 +10,35 @@ describe Failurous::FailNotifier do
     Failurous::Config.server_address = 'localhost'
     Failurous::Config.api_key = 'asdf'
     Failurous::Config.server_port = 5000
+    
+    @http = mock()
+    @http.stub!(:use_ssl=)
+    
+    Net::HTTP.should_receive(:new).with('localhost', 5000).and_return(@http)
   end
   
   it "should post to the given server" do
-    http = mock()
-    Net::HTTP.should_receive(:new).with('localhost', 5000).and_return(http)
+    @http.should_receive(:post).with('/api/projects/asdf/fails', anything())
+    Failurous::FailNotifier.send_fail(@notification)
+  end
+  
+  it "should not use SSL if not configured to do so" do
+    @http.should_not_receive(:use_ssl=).with(true)
+    @http.should_receive(:post)
+    Failurous::FailNotifier.send_fail(@notification)
+  end
+  
+  it "should use SSL if configured to do so" do
+    Failurous::Config.use_ssl = true
+
+    @http.should_receive(:use_ssl=).with(true)
+    @http.should_receive(:post)
     
-    http.should_receive(:post).with('/api/projects/asdf/fails', anything())
     Failurous::FailNotifier.send_fail(@notification)
   end
   
   it "should not fail when Net::HTTP#post raises error" do
-    http = mock()
-    http.should_receive(:post).and_raise(SocketError)
-    Net::HTTP.should_receive(:new).and_return(http)
+    @http.should_receive(:post).and_raise(SocketError)
     
     lambda {
       Failurous::FailNotifier.send_fail(@notification)
