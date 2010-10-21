@@ -1,9 +1,10 @@
 module Failurous
   class Config
     @@server_address = ""
+    @@server_port = 80
     @@api_key = ""
     @@ignore_exceptions = []
-    
+        
     class << self
       def server_address=(val)
         @@server_address = val
@@ -27,6 +28,14 @@ module Failurous
       
       def ignore_exceptions
         @@ignore_exceptions
+      end
+      
+      def server_port=(val)
+        @@server_port = val
+      end
+      
+      def server_port
+        @@server_port
       end
     end
   end
