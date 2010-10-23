@@ -1,4 +1,5 @@
 require 'net/http'
+require 'net/https'
 require 'uri'
 require 'active_support'
 
@@ -11,7 +12,7 @@ module Failurous
       http.use_ssl = Failurous::Config.use_ssl?
       http.post("/api/projects/#{Failurous::Config.api_key}/fails", data)
     rescue => boom
-      
+
     end
   end
 end
