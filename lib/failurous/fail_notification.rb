@@ -16,6 +16,15 @@ module Failurous
 
     end
 
+    # Determines whether FailMiddleware should ignore _exception_ in _object_.
+    # Default implementation returns *false* for everything.
+    #
+    # @param exception [Exception] the exception
+    # @param object [Object] the object
+    # @return [Boolean] *true* if the exception in object should be ignored; *false* otherwise
+    def self.ignore?(exception, object = nil)
+
+    end
 
     # Fills notification details from the given exception. Please note that
     # if the title and/or location has been specified previously, those
