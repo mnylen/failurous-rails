@@ -1,0 +1,29 @@
+GIT
+  remote: git://github.com/mnylen/failurous-ruby.git
+  revision: fe1e760b4cd9eb84e2ec89819c6a366aed39a289
+  specs:
+    failurous-ruby (0.0.0)
+      json
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.2)
+    json (1.4.6)
+    rspec (2.0.1)
+      rspec-core (~> 2.0.1)
+      rspec-expectations (~> 2.0.1)
+      rspec-mocks (~> 2.0.1)
+    rspec-core (2.0.1)
+    rspec-expectations (2.0.1)
+      diff-lcs (>= 1.1.2)
+    rspec-mocks (2.0.1)
+      rspec-core (~> 2.0.1)
+      rspec-expectations (~> 2.0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  failurous-ruby!
+  rspec (~> 2.0.0)
