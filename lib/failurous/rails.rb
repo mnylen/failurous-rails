@@ -7,14 +7,14 @@ module Failurous::Rails
   autoload :FailNotification, "#{ROOT}/rails/fail_notification"
   autoload :FailMiddleware,   "#{ROOT}/rails/fail_middleware"
   
-  def self.configure(install_middleware = true)
+  def self.configure(install_middleware = true, &block)
     config = Config.new
     block.call(config)
     
-    FailNotifier.notifier = FailNotifier.new(config)
+    Failurous::FailNotifier.notifier = Failurous::FailNotifier.new(config)
     
     if install_middleware
-      ::Rails.application.midleware.use FailMiddleware
+      ::Rails.application.middleware.use FailMiddleware
     end
   end
 end
