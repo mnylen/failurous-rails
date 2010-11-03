@@ -6,6 +6,7 @@ module Failurous::Rails
     def initialize
       self.custom_notification = Failurous::Rails::FailNotification
       self.ignore_exceptions   = []
+      self.logger              = ::Rails.logger
     end
   end
 end
