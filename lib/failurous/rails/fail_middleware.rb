@@ -7,7 +7,7 @@ module Failurous::Rails
     def call(env)
       @app.call(env)
     rescue Exception => exception
-      unless Failurous.notifier.config.ignore_exceptions.include?(exception.class)
+      unless Failurous::FailNotifier.notifier.config.ignore_exceptions.include?(exception.class)
         notify_of_exception(env, exception)
       end
       
