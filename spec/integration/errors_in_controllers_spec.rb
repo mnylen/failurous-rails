@@ -6,4 +6,10 @@ describe "errors in controllers" do
   def app
     @app ||= Rails.application
   end
+
+
+  it "should notify of errors in controllers" do
+    Failurous.should_receive(:notify)
+    get "/troops/move"
+  end
 end
