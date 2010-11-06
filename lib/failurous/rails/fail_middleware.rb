@@ -17,7 +17,7 @@ module Failurous::Rails
     private
     
       def notify_of_exception(env, exception)
-        controller = env['action_controller.instance'] || MissingController.new
+        controller = env['action_controller.instance']
         Failurous.notify(exception, controller)
       end
   end
