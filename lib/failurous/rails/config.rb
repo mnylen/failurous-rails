@@ -1,5 +1,3 @@
-require 'rails'
-
 module Failurous::Rails
   class Config < Failurous::Config
     # Lists all exceptions that should be ignored, i.e, when these occur in actions, notifications will not be sent
